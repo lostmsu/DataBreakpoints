@@ -17,16 +17,16 @@
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool SetThreadContext(SafeObjectHandle threadHandle, IntPtr context);
 
-        public void Get(SafeObjectHandle threadHandle) {
+        public static void Get(SafeObjectHandle threadHandle, ref Win32ThreadContext context) {
             var raw = Marshal.AllocHGlobal(Marshal.SizeOf<Win32ThreadContext>() + 8);
             try {
                 var aligned = new IntPtr(16 * (((long)raw + 15) / 16));
-                Marshal.StructureToPtr(this, aligned, fDeleteOld: true);
+                Marshal.StructureToPtr(context, aligned, fDeleteOld: true);
 
                 if (!GetThreadContext(threadHandle, aligned))
                     throw new Win32Exception();
 
-                this = Marshal.PtrToStructure<Win32ThreadContext>(aligned);
+                context = Marshal.PtrToStructure<Win32ThreadContext>(aligned);
             } finally {
                 Marshal.FreeHGlobal(raw);
             }
@@ -40,8 +40,6 @@
 
                 if (!SetThreadContext(threadHandle, aligned))
                     throw new Win32Exception();
-
-                this = Marshal.PtrToStructure<Win32ThreadContext>(aligned);
             } finally {
                 Marshal.FreeHGlobal(raw);
             }

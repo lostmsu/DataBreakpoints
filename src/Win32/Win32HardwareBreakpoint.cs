@@ -5,7 +5,7 @@
     using static PInvoke.Kernel32;
     using Win32Exception = System.ComponentModel.Win32Exception;
 
-    class Win32HardwareBreakpoint {
+    class Win32HardwareBreakpoint: IDisposable {
         IntPtr Address;
         SafeObjectHandle ThreadHandle;
         HardwareBreakpointType Type;
@@ -14,6 +14,7 @@
         int iReg;
         Operation Op;
         bool SUCC;
+        GCHandle gcHandle;
 
         enum Operation
         {
@@ -37,7 +38,7 @@
             }
         }
 
-        static unsafe int th(IntPtr lpParameter) {
+        static int th(IntPtr lpParameter) {
             if (lpParameter == IntPtr.Zero) throw new ArgumentNullException(nameof(lpParameter));
 
             var breakpoint = (Win32HardwareBreakpoint)GCHandle.FromIntPtr(lpParameter).Target;
@@ -49,7 +50,7 @@
                 ContextFlags = ContextFlags.DebugRegisters,
             };
 
-            ct.Get(breakpoint.ThreadHandle);
+            Win32ThreadContext.Get(breakpoint.ThreadHandle, ref ct);
             GetLastError().ThrowOnError();
 
             int FlagBit = 0;
@@ -148,8 +149,8 @@
             ct.ContextFlags = ContextFlags.DebugRegisters;
             ct.Set(breakpoint.ThreadHandle);
 
-            ct.ContextFlags = ContextFlags.DebugRegisters;
-            ct.Get(breakpoint.ThreadHandle);
+            ct = new Win32ThreadContext {ContextFlags = ContextFlags.DebugRegisters};
+            Win32ThreadContext.Get(breakpoint.ThreadHandle, ref ct);
 
             threadOpResult = ResumeThread(breakpoint.ThreadHandle);
             GetLastError().ThrowOnError();
@@ -160,7 +161,7 @@
             return 0;
         }
 
-        public static GCHandle? Set(SafeObjectHandle threadHandle,
+        public static Win32HardwareBreakpoint TrySet(SafeObjectHandle threadHandle,
             HardwareBreakpointType type, HardwareBreakpointSize size, IntPtr address) {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || IntPtr.Size != 8)
                 throw new PlatformNotSupportedException("Only 64 bit Windows is supported");
@@ -203,11 +204,13 @@
                 return null;
             }
 
+            breakpoint.gcHandle = h;
+
             GC.KeepAlive(threadProc);
-            return h;
+            return breakpoint;
         }
 
-        public static void Remove(GCHandle handle) {
+        static void Remove(GCHandle handle) {
             if (!handle.IsAllocated) throw new ArgumentNullException(nameof(handle));
 
             var breakpoint = (Win32HardwareBreakpoint)handle.Target;
@@ -234,6 +237,14 @@
             }
 
             handle.Free();
+        }
+
+        public void Dispose() {
+            if (!this.SUCC)
+                return;
+
+            Remove(this.gcHandle);
+            this.SUCC = false;
         }
     }
 }
