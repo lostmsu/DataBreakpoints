@@ -4,6 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Version>0.1.0</Version>
+    <Authors>Victor Milovanov</Authors>
+    <Description>Allows one to programmatically set data breakpoints (Win64 only)</Description>
+    <Copyright>Victor Milovanov</Copyright>
+    <PackageProjectUrl>https://github.com/lostmsu/DataBreakpoints</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lostmsu/DataBreakpoints.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>debugging;data breakpoint;breakpoint</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
