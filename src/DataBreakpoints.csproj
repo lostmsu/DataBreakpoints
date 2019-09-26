@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Victor Milovanov</Authors>
     <Description>Allows one to programmatically set data breakpoints (Win64 only)</Description>
     <Copyright>Victor Milovanov</Copyright>
@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="PInvoke.Kernel32" Version="0.5.184" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,8 @@
 ﻿namespace DataBreakpoints.Win32 {
     using System;
     using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Linq;
 
     class Win32DataBreakpointFactory: IDataBreakpointFactory {
         public IDisposable Set(int threadID, IntPtr address, UIntPtr size, DataBreakpointTrigger trigger) {
@@ -28,6 +30,17 @@
             if (breakpoint == null)
                 throw new InvalidOperationException("Data breakpoint limit reached");
             return breakpoint;
+        }
+
+        public IDisposable Set(IntPtr address, UIntPtr size, DataBreakpointTrigger trigger) {
+            var breakpoints = new DisposableCollection();
+            var threads = Process.GetCurrentProcess().Threads
+                .Cast<ProcessThread>().ToArray();
+            foreach (var thread in threads) {
+                breakpoints.Add(this.Set(thread.Id, address, size, trigger));
+            }
+
+            return breakpoints;
         }
     }
 }
