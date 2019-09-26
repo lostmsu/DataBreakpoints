@@ -1,4 +1,5 @@
-﻿namespace DataBreakpoints.Win32 {
+﻿#pragma warning disable 169 // unused fields
+namespace DataBreakpoints.Win32 {
     using M128A_Half = System.UInt64;
     unsafe struct XmmLegacyStruct {
         fixed M128A_Half Header[2*2];

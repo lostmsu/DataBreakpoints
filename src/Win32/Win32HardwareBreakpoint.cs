@@ -192,10 +192,10 @@
                 throw new Win32Exception();
 
             WaitForSingleObject(breakpoint.CompletionEvent, dwMilliseconds: Constants.INFINITE);
-            breakpoint.CompletionEvent.Close();
+            breakpoint.CompletionEvent.Dispose();
 
             if (self) {
-                breakpoint.ThreadHandle.Close();
+                breakpoint.ThreadHandle.Dispose();
             }
 
             breakpoint.ThreadHandle = threadHandle;
@@ -231,9 +231,9 @@
             if (Win32Thread.CreateThread(IntPtr.Zero, UIntPtr.Zero, th, (IntPtr)handle, 0, out int _).IsInvalid)
                 throw new Win32Exception();
             WaitForSingleObject(breakpoint.CompletionEvent, Constants.INFINITE);
-            breakpoint.CompletionEvent.Close();
+            breakpoint.CompletionEvent.Dispose();
             if (isSelf) {
-                breakpoint.ThreadHandle.Close();
+                breakpoint.ThreadHandle.Dispose();
             }
 
             handle.Free();

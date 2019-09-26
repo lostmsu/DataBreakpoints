@@ -3,7 +3,7 @@
     using System.Runtime.InteropServices;
     using static PInvoke.Kernel32;
 
-    class Win32Thread {
+    static class Win32Thread {
         [DllImport("kernel32.dll")]
         public static extern SafeObjectHandle GetCurrentThread();
 

@@ -1,4 +1,5 @@
-﻿namespace DataBreakpoints.Win32 {
+﻿#pragma warning disable 169 // unused fields
+namespace DataBreakpoints.Win32 {
     using DWORD64 = System.UInt64;
     using DWORD = System.UInt32;
     using WORD = System.UInt16;
